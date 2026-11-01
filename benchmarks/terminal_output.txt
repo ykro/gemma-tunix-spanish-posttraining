@@ -1,0 +1,40 @@
+==============================================================================
+ OUTSIDE JUDGE VERIFICATION: gemma-tunix-spanish-posttraining
+==============================================================================
+ [STAGE 01] 2D XLA Mesh Topology       : 4 devices {'data': 2, 'model': 2} (backend=cpu)
+            Batch Token Sharding       : global=(8, 64) -> shard=(4, 64)
+            Q-Proj Weight Sharding     : global=(256, 256) -> shard=(256, 128) (2.0x memory reduction)
+------------------------------------------------------------------------------
+ [STAGE 02] Gemma-2/3 Flax NNX Model   : 4,198,656 base parameters (4 layers, d_model=256)
+            GQA & Soft-Capping         : 4Q/2KV (2:1 GQA), max |logit|=3.737 <= 30.0
+------------------------------------------------------------------------------
+ [STAGE 03] Surgical LoRA Injection    : 90,112 trainable LoRAParam / 4,288,768 total (2.10% trainable, 97.90% reduction)
+            Base Parameter Drift       : max |diff| = 0.00000000 (bitwise frozen = True)
+            LoRA Adapter Update        : max |diff| = 0.003000 (loss 7.0840 -> 6.3918)
+------------------------------------------------------------------------------
+ [STAGE 04] Critic-Free GRPO Loop      : G=4 group rollouts/prompt, 24 steps, KL beta=0.04
+            Step 01                    : loss=-0.0379 | KL=1.3823 | eval_reward=+1.2000 | XML_compliance=50%
+            Step 06                    : loss=+0.0256 | KL=2.3891 | eval_reward=+0.8000 | XML_compliance=25%
+            Step 12                    : loss=+0.0424 | KL=2.4705 | eval_reward=+0.8000 | XML_compliance=25%
+            Step 18                    : loss=+0.0495 | KL=2.7993 | eval_reward=+1.4875 | XML_compliance=75%
+            Step 24                    : loss=+0.0459 | KL=2.5481 | eval_reward=+1.4875 | XML_compliance=75%
+------------------------------------------------------------------------------
+ [STAGE 05] Spanish Acid Test Summary  : Reward -0.0625 -> +1.4875 (Delta +1.5500)
+            XML Format Compliance      : 0.0% -> 75.0% (+75.0%)
+            Post-GRPO Base Weight Drift: max |diff| = 0.00000000
+------------------------------------------------------------------------------
+   Prompt [tpu_mesh_2d] : Explica cómo la malla 2D en TPU v5e particiona tensores y reduce memoria HBM.
+     Base (+0.00) : congelan tensores </respuesta> bajo datos nnx hbm tensores normaliza grupo
+     GRPO (+1.70) : <razonamiento> malla particiona tensores </razonamiento> <respuesta> estabiliza </respuesta> reduce memoria
+   Prompt [lora_surgical] : Describe por qué los adaptadores LoRA de rango bajo congelan los pesos base.
+     Base (-0.10) : <pad> nnx kl modelo <pad> divergencia datos datos datos datos
+     GRPO (+1.85) : <razonamiento> adaptadores lora congelan pesos </razonamiento> <respuesta> estabiliza </respuesta> kl
+   Prompt [grpo_critic_free] : Analiza cómo GRPO normaliza recompensas por grupo y elimina el modelo crítico.
+     Base (-0.05) : divergencia pesos reduce grafo congelan normaliza pesos </razonamiento> xla pesos
+     GRPO (+2.00) : <razonamiento> grpo normaliza recompensas elimina critico </razonamiento> <respuesta> estabiliza </respuesta>
+   Prompt [nnx_split_state] : Detalla cómo Flax NNX separa el grafo y el estado para compilación XLA.
+     Base (-0.10) : modelo reduce tpu normaliza politica politica politica politica v5e <respuesta>
+     GRPO (+0.40) : <razonamiento> flax nnx separa estado grafo </respuesta> <razonamiento> flax </razonamiento>
+==============================================================================
+ VERIFICATION STATUS: PASS (9/9 checks passed in 16.08s)
+==============================================================================

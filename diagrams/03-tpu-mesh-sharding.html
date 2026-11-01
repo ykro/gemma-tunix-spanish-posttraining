@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sharding 2D de XLA Mesh en Cloud TPU v5e</title>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --color-paper:   #F7F6F2;
+      --color-paper-2: #EFECE6;
+      --color-ink:     #0F2547;
+      --color-muted:   #3B5B8C;
+      --color-accent:  #C59216;
+      --font-sans:     'Geist', system-ui, sans-serif;
+      --font-serif:    'Instrument Serif', serif;
+      --font-mono:     'Geist Mono', ui-monospace, monospace;
+    }
+
+    body {
+      font-family: var(--font-sans);
+      background: var(--color-paper);
+      color: var(--color-ink);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2.5rem 2rem;
+    }
+
+    .frame { max-width: 1200px; width: 100%; }
+    .diagram-container { width: 100%; overflow-x: auto; }
+
+    .eyebrow {
+      font-family: var(--font-mono);
+      font-size: 0.66rem;
+      font-weight: 500;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--color-muted);
+      margin-bottom: 0.5rem;
+    }
+
+    h1 {
+      font-family: var(--font-serif);
+      font-size: clamp(1.5rem, 2.4vw + 0.75rem, 2rem);
+      font-weight: 400;
+      letter-spacing: -0.02em;
+      line-height: 1.15;
+      color: var(--color-ink);
+      margin-bottom: 1.25rem;
+    }
+
+    svg { width: 100%; min-width: 960px; display: block; }
+    @media print {
+      .diagram-container { overflow-x: visible; }
+      svg { min-width: 0; }
+    }
+  </style>
+</head>
+<body>
+  <div class="frame">
+    <p class="eyebrow">Nested Sharding · OpenXLA GSPMD</p>
+    <h1>Topología 2D jax.sharding.Mesh((&apos;data&apos;, &apos;model&apos;)) en TPU v5e</h1>
+
+    <div class="diagram-container">
+      <svg viewBox="0 0 960 540" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="tpu-mesh-sharding-title tpu-mesh-sharding-desc">
+        <title id="tpu-mesh-sharding-title">Topología 2D jax.sharding.Mesh((data, model)) en TPU v5e</title>
+        <desc id="tpu-mesh-sharding-desc">Diagrama anidado de sharding 2D en OpenXLA que sample cómo un mesh de 2 por 2 dispositivos divide batches de datos en el eje data y tensores de pesos Gemma y LoRA en el eje model.</desc>
+        <defs>
+          <marker id="arrow" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+            <polygon points="0 0, 8 3, 0 6" fill="#3B5B8C"/>
+          </marker>
+          <marker id="arrow-accent" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+            <polygon points="0 0, 8 3, 0 6" fill="#C59216"/>
+          </marker>
+          <marker id="arrow-link" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+            <polygon points="0 0, 8 3, 0 6" fill="#0F2547"/>
+          </marker>
+        </defs>
+
+        <rect width="100%" height="100%" fill="#F7F6F2"/>
+
+        <!-- Outer Container: 2D XLA Mesh ('data'=2, 'model'=2) -->
+        <rect x="336" y="36" width="592" height="404" rx="6" fill="#EFECE6" stroke="#0F2547" stroke-width="1.4"/>
+        <text x="356" y="60" fill="#0F2547" font-size="9" font-weight="600" font-family="'Geist Mono', monospace" letter-spacing="0.08em">JAX.SHARDING.MESH · SHAPE (&apos;DATA&apos;: 2, &apos;MODEL&apos;: 2) · ICI INTERCONNECT</text>
+
+        <!-- Column Headers inside Mesh (Model Axis) -->
+        <text x="488" y="84" fill="#3B5B8C" font-size="9" font-weight="600" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.10em">EJE MODEL = 0 (COLUMNAS 0..127)</text>
+        <text x="768" y="84" fill="#3B5B8C" font-size="9" font-weight="600" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.10em">EJE MODEL = 1 (COLUMNAS 128..255)</text>
+
+        <!-- Connectors from Global PartitionSpec Panel to the 2x2 TPU Mesh -->
+        <!-- 1. Batch PartitionSpec('data', None) -> Mesh Row 0 -->
+        <line x1="236" y1="156" x2="364" y2="156" stroke="#3B5B8C" stroke-width="1.4" marker-end="url(#arrow)"/>
+        <rect x="248" y="136" width="76" height="12" rx="2" fill="#F7F6F2"/>
+        <text x="286" y="145" fill="#3B5B8C" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.06em">P(&apos;DATA&apos;,NONE)</text>
+
+        <!-- 2. Weight & LoRA PartitionSpec(None, 'model') -> Mesh Row 1 (Accent) -->
+        <line x1="236" y1="336" x2="364" y2="336" stroke="#C59216" stroke-width="1.8" marker-end="url(#arrow-accent)"/>
+        <rect x="244" y="316" width="84" height="12" rx="2" fill="#F7F6F2"/>
+        <text x="286" y="325" fill="#9A6F0B" font-size="8" font-weight="600" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.06em">P(NONE,&apos;MODEL&apos;)</text>
+
+        <!-- Left Global Spec Node 1: Batch Tokens -->
+        <rect x="32" y="100" width="204" height="112" rx="6" fill="#F7F6F2"/>
+        <rect x="32" y="100" width="204" height="112" rx="6" fill="#FFFFFF" stroke="#0F2547" stroke-width="1.2"/>
+        <rect x="44" y="108" width="44" height="12" rx="2" fill="transparent" stroke="#3B5B8C" stroke-width="0.8"/>
+        <text x="66" y="117" fill="#3B5B8C" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.08em">BATCH</text>
+        <text x="134" y="146" fill="#0F2547" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">Batch Global de Tokens</text>
+        <text x="134" y="166" fill="#3B5B8C" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">Global: (8, 64) int32</text>
+        <text x="134" y="184" fill="#3B5B8C" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle">Shard por fila: (4, 64)</text>
+
+        <!-- Left Global Spec Node 2: Gemma + LoRA Weights (Focal Node 1) -->
+        <rect x="32" y="280" width="204" height="112" rx="6" fill="#F7F6F2"/>
+        <rect x="32" y="280" width="204" height="112" rx="6" fill="rgba(197,146,22,0.12)" stroke="#C59216" stroke-width="1.6"/>
+        <rect x="44" y="288" width="52" height="12" rx="2" fill="transparent" stroke="#C59216" stroke-width="0.8"/>
+        <text x="70" y="297" fill="#9A6F0B" font-size="7" font-weight="600" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.08em">WEIGHTS</text>
+        <text x="134" y="326" fill="#0F2547" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">Pesos QKV / MLP + LoRA B</text>
+        <text x="134" y="346" fill="#9A6F0B" font-size="9" font-weight="600" font-family="'Geist Mono', monospace" text-anchor="middle">Global Q: (256, 256) fp32</text>
+        <text x="134" y="364" fill="#3B5B8C" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle">Shard por chip: (256, 128) · 50% HBM</text>
+
+        <!-- TPU Chip (0, 0) - Focal Node 2 showing shard anatomy -->
+        <rect x="364" y="100" width="248" height="144" rx="6" fill="#F7F6F2"/>
+        <rect x="364" y="100" width="248" height="144" rx="6" fill="rgba(197,146,22,0.12)" stroke="#C59216" stroke-width="1.6"/>
+        <rect x="376" y="108" width="64" height="14" rx="2" fill="transparent" stroke="#C59216" stroke-width="0.8"/>
+        <text x="408" y="118" fill="#9A6F0B" font-size="7" font-weight="600" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.08em">TPU (0, 0)</text>
+        <text x="488" y="142" fill="#0F2547" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">Dispositivo XLA 0 · data=0, model=0</text>
+        <text x="488" y="164" fill="#0F2547" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">Tokens[0:4, 0:64] · Batch mitad A</text>
+        <text x="488" y="184" fill="#9A6F0B" font-size="9" font-weight="600" font-family="'Geist Mono', monospace" text-anchor="middle">W_q[:, 0:128] + LoRA_B[:, 0:128]</text>
+        <text x="488" y="204" fill="#3B5B8C" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle">W_down[0:512, :] · P(&apos;model&apos;, None)</text>
+        <text x="488" y="224" fill="#3B5B8C" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle">LoRA_A[256, 4] Replicado</text>
+
+        <!-- TPU Chip (0, 1) -->
+        <rect x="644" y="100" width="248" height="144" rx="6" fill="#F7F6F2"/>
+        <rect x="644" y="100" width="248" height="144" rx="6" fill="#FFFFFF" stroke="#0F2547" stroke-width="1.2"/>
+        <rect x="656" y="108" width="64" height="14" rx="2" fill="transparent" stroke="#3B5B8C" stroke-width="0.8"/>
+        <text x="688" y="118" fill="#3B5B8C" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.08em">TPU (0, 1)</text>
+        <text x="768" y="142" fill="#0F2547" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">Dispositivo XLA 1 · data=0, model=1</text>
+        <text x="768" y="164" fill="#0F2547" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">Tokens[0:4, 0:64] · Batch mitad A</text>
+        <text x="768" y="184" fill="#3B5B8C" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">W_q[:, 128:256] + LoRA_B[:, 128:256]</text>
+        <text x="768" y="204" fill="#3B5B8C" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle">W_down[512:1024, :] · P(&apos;model&apos;, None)</text>
+        <text x="768" y="224" fill="#3B5B8C" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle">LoRA_A[256, 4] Replicado</text>
+
+        <!-- TPU Chip (1, 0) -->
+        <rect x="364" y="272" width="248" height="144" rx="6" fill="#F7F6F2"/>
+        <rect x="364" y="272" width="248" height="144" rx="6" fill="#FFFFFF" stroke="#0F2547" stroke-width="1.2"/>
+        <rect x="376" y="280" width="64" height="14" rx="2" fill="transparent" stroke="#3B5B8C" stroke-width="0.8"/>
+        <text x="408" y="290" fill="#3B5B8C" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.08em">TPU (1, 0)</text>
+        <text x="488" y="314" fill="#0F2547" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">Dispositivo XLA 2 · data=1, model=0</text>
+        <text x="488" y="336" fill="#0F2547" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">Tokens[4:8, 0:64] · Batch mitad B</text>
+        <text x="488" y="356" fill="#3B5B8C" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">W_q[:, 0:128] + LoRA_B[:, 0:128]</text>
+        <text x="488" y="376" fill="#3B5B8C" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle">W_down[0:512, :] · P(&apos;model&apos;, None)</text>
+        <text x="488" y="396" fill="#3B5B8C" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle">LoRA_A[256, 4] Replicado</text>
+
+        <!-- TPU Chip (1, 1) -->
+        <rect x="644" y="272" width="248" height="144" rx="6" fill="#F7F6F2"/>
+        <rect x="644" y="272" width="248" height="144" rx="6" fill="#FFFFFF" stroke="#0F2547" stroke-width="1.2"/>
+        <rect x="656" y="280" width="64" height="14" rx="2" fill="transparent" stroke="#3B5B8C" stroke-width="0.8"/>
+        <text x="688" y="290" fill="#3B5B8C" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.08em">TPU (1, 1)</text>
+        <text x="768" y="314" fill="#0F2547" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">Dispositivo XLA 3 · data=1, model=1</text>
+        <text x="768" y="336" fill="#0F2547" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">Tokens[4:8, 0:64] · Batch mitad B</text>
+        <text x="768" y="356" fill="#3B5B8C" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">W_q[:, 128:256] + LoRA_B[:, 128:256]</text>
+        <text x="768" y="376" fill="#3B5B8C" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle">W_down[512:1024, :] · P(&apos;model&apos;, None)</text>
+        <text x="768" y="396" fill="#3B5B8C" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle">LoRA_A[256, 4] Replicado</text>
+
+        <!-- Horizontal Legend Strip at Bottom -->
+        <line x1="32" y1="468" x2="928" y2="468" stroke="#3B5B8C" stroke-width="0.8" opacity="0.35"/>
+        <text x="32" y="492" fill="#3B5B8C" font-size="8" font-weight="600" font-family="'Geist Mono', monospace" letter-spacing="0.14em">LEYENDA</text>
+
+        <rect x="116" y="482" width="14" height="14" rx="2" fill="rgba(197,146,22,0.12)" stroke="#C59216" stroke-width="1.4"/>
+        <text x="138" y="492" fill="#0F2547" font-size="9" font-family="'Geist', sans-serif">Shard Focal (Compresión 2.0x por Eje Model)</text>
+
+        <rect x="388" y="482" width="14" height="14" rx="2" fill="#FFFFFF" stroke="#0F2547" stroke-width="1.2"/>
+        <text x="410" y="492" fill="#0F2547" font-size="9" font-family="'Geist', sans-serif"> Réplica / Shard de Dispositivo TPU</text>
+
+        <rect x="616" y="482" width="14" height="14" rx="2" fill="#EFECE6" stroke="#0F2547" stroke-width="1.2"/>
+        <text x="638" y="492" fill="#0F2547" font-size="9" font-family="'Geist', sans-serif">Contenedor de 2D Mesh OpenXLA GSPMD</text>
+      </svg>
+    </div>
+  </div>
+</body>
+</html>

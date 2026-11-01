@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg viewBox="0 0 960 540" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="grpo-dataflow-title grpo-dataflow-desc" id="d-02-grpo-dataflow-root">
+        <title id="grpo-dataflow-title">Flujo GRPO sin Modelo Crítico en JAX y Flax NNX</title>
+        <desc id="grpo-dataflow-desc">Diagrama de flujo de datos de Group Relative Policy Optimization mostrando muestreo grupal G, recompensa determinista en español, normalización relativa de ventajas y penalización KL frente al modelo base congelado sin red crítica.</desc>
+        <defs>
+      <style>@import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&amp;family=Geist:wght@400;500;600&amp;family=Geist+Mono:wght@400;500;600&amp;family=Noto+Serif:ital@0;1&amp;family=Noto+Sans+KR:wght@400;500;600&amp;family=Noto+Serif+KR:wght@400&amp;family=Noto+Sans+TC:wght@400;500;600&amp;family=Noto+Serif+TC:wght@400&amp;display=swap');
+      #d-02-grpo-dataflow-root { --color-paper:   #F7F6F2;
+      --color-paper-2: #EFECE6;
+      --color-ink:     #0F2547;
+      --color-muted:   #3B5B8C;
+      --color-accent:  #C59216;
+      --font-sans:     'Geist', system-ui, sans-serif;
+      --font-serif:    'Instrument Serif', serif;
+      --font-mono:     'Geist Mono', ui-monospace, monospace; }
+      #d-02-grpo-dataflow-root { font-family: var(--font-sans); color: var(--color-ink); }
+      #d-02-grpo-dataflow-root .diagram-container { width: 100%; overflow-x: auto; }
+      #d-02-grpo-dataflow-root .diagram-container { overflow-x: visible; }</style>
+          <marker id="d-02-grpo-dataflow-arrow" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+            <polygon points="0 0, 8 3, 0 6" fill="#3B5B8C"/>
+          </marker>
+          <marker id="d-02-grpo-dataflow-arrow-accent" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+            <polygon points="0 0, 8 3, 0 6" fill="#C59216"/>
+          </marker>
+          <marker id="d-02-grpo-dataflow-arrow-link" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+            <polygon points="0 0, 8 3, 0 6" fill="#0F2547"/>
+          </marker>
+        </defs>
+
+        <rect width="100%" height="100%" fill="#F7F6F2"/>
+
+        <!-- Connectors (drawn before nodes) -->
+        <!-- 1. Prompt Técnico ES -> Policy Rollout (top attach point on Prompt right edge) -->
+        <path d="M 192 204 L 220 204 A 8 8 0 0 0 228 196 L 228 132 A 8 8 0 0 1 236 124 L 264 124" fill="none" stroke="#3B5B8C" stroke-width="1.4" marker-end="url(#d-02-grpo-dataflow-arrow)"/>
+        <rect x="160" y="156" width="60" height="12" rx="2" fill="#F7F6F2"/>
+        <text x="190" y="165" fill="#3B5B8C" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.06em">SAMPLING</text>
+
+        <!-- 2. Prompt Técnico ES -> Frozen Reference Model (bottom attach point on Prompt right edge) -->
+        <path d="M 192 236 L 220 236 A 8 8 0 0 1 228 244 L 228 324 A 8 8 0 0 0 236 332 L 264 332" fill="none" stroke="#3B5B8C" stroke-width="1.4" stroke-dasharray="5,4" marker-end="url(#d-02-grpo-dataflow-arrow)"/>
+        <rect x="160" y="276" width="60" height="12" rx="2" fill="#F7F6F2"/>
+        <text x="190" y="285" fill="#3B5B8C" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.06em">PREFILL</text>
+
+        <!-- 3. Policy Rollout -> Deterministic Reward & Group Normalization (Accent) -->
+        <line x1="448" y1="124" x2="516" y2="124" stroke="#C59216" stroke-width="1.8" marker-end="url(#d-02-grpo-dataflow-arrow-accent)"/>
+        <rect x="456" y="104" width="52" height="12" rx="2" fill="#F7F6F2"/>
+        <text x="482" y="113" fill="#9A6F0B" font-size="8" font-weight="600" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.06em">G SALIDAS</text>
+
+        <!-- 4. Policy Rollout -> Surrogate Loss + KL (log pi_theta) -->
+        <path d="M 356 172 L 356 220 A 8 8 0 0 0 364 228 L 748 228" fill="none" stroke="#3B5B8C" stroke-width="1.4" marker-end="url(#d-02-grpo-dataflow-arrow)"/>
+        <rect x="412" y="208" width="68" height="12" rx="2" fill="#F7F6F2"/>
+        <text x="446" y="217" fill="#3B5B8C" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.06em">LOG PI_THETA</text>
+
+        <!-- 5. Group Advantage Normalization -> Surrogate Loss + KL (Accent) -->
+        <path d="M 708 124 L 832 124 A 8 8 0 0 1 840 132 L 840 176" fill="none" stroke="#C59216" stroke-width="1.8" marker-end="url(#d-02-grpo-dataflow-arrow-accent)"/>
+        <rect x="736" y="104" width="76" height="12" rx="2" fill="#F7F6F2"/>
+        <text x="774" y="113" fill="#9A6F0B" font-size="8" font-weight="600" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.06em">VENTAJA A_HAT</text>
+
+        <!-- 6. Frozen Reference Model -> Surrogate Loss + KL (log pi_ref) -->
+        <path d="M 448 332 L 832 332 A 8 8 0 0 0 840 324 L 840 280" fill="none" stroke="#3B5B8C" stroke-width="1.4" stroke-dasharray="5,4" marker-end="url(#d-02-grpo-dataflow-arrow)"/>
+        <rect x="572" y="312" width="68" height="12" rx="2" fill="#F7F6F2"/>
+        <text x="606" y="321" fill="#3B5B8C" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.06em">LOG PI_REF</text>
+
+        <!-- 7. Surrogate Loss + KL -> Policy LoRA Update (Feedback loop at top) -->
+        <path d="M 900 176 L 900 52 A 8 8 0 0 0 892 44 L 364 44 A 8 8 0 0 0 356 52 L 356 76" fill="none" stroke="#C59216" stroke-width="1.6" stroke-dasharray="5,4" marker-end="url(#d-02-grpo-dataflow-arrow-accent)"/>
+        <rect x="588" y="24" width="72" height="12" rx="2" fill="#F7F6F2"/>
+        <text x="624" y="33" fill="#9A6F0B" font-size="8" font-weight="600" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.06em">GRADS LORA</text>
+
+        <!-- Node 1: Spanish Technical Prompt -->
+        <rect x="32" y="172" width="160" height="96" rx="6" fill="#F7F6F2"/>
+        <rect x="32" y="172" width="160" height="96" rx="6" fill="#FFFFFF" stroke="#0F2547" stroke-width="1.2"/>
+        <rect x="44" y="180" width="44" height="14" rx="2" fill="none" stroke="#3B5B8C" stroke-width="0.8"/>
+        <text x="66" y="190" fill="#3B5B8C" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.08em">INPUT</text>
+        <text x="112" y="218" fill="#0F2547" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">Prompt Técnico ES</text>
+        <text x="112" y="236" fill="#3B5B8C" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">x_i · Batch Sharded</text>
+        <text x="112" y="252" fill="#3B5B8C" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle">Instrucción XML</text>
+
+        <!-- Node 2: Active Policy Rollout (Gemma + LoRA) -->
+        <rect x="264" y="76" width="184" height="96" rx="6" fill="#F7F6F2"/>
+        <rect x="264" y="76" width="184" height="96" rx="6" fill="#FFFFFF" stroke="#0F2547" stroke-width="1.2"/>
+        <rect x="276" y="84" width="48" height="14" rx="2" fill="none" stroke="#3B5B8C" stroke-width="0.8"/>
+        <text x="300" y="94" fill="#3B5B8C" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.08em">POLICY</text>
+        <text x="356" y="122" fill="#0F2547" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">Rollout Grupal π_θ</text>
+        <text x="356" y="140" fill="#3B5B8C" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">G=4 candidatos / prompt</text>
+        <text x="356" y="156" fill="#3B5B8C" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle">Gemma + nnx.LoRAParam</text>
+
+        <!-- Node 3: Frozen Reference Model -->
+        <rect x="264" y="284" width="184" height="96" rx="6" fill="#F7F6F2"/>
+        <rect x="264" y="284" width="184" height="96" rx="6" fill="#EFECE6" stroke="#3B5B8C" stroke-width="1.2"/>
+        <rect x="276" y="292" width="44" height="14" rx="2" fill="none" stroke="#3B5B8C" stroke-width="0.8"/>
+        <text x="298" y="302" fill="#3B5B8C" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.08em">FROZEN</text>
+        <text x="356" y="330" fill="#0F2547" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">Referencia Base π_ref</text>
+        <text x="356" y="348" fill="#3B5B8C" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">stop_gradient(base)</text>
+        <text x="356" y="364" fill="#3B5B8C" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle">Cero memoria de Crítico</text>
+
+        <!-- Node 4: Deterministic Reward & Group Normalization (Focal Node 1) -->
+        <rect x="516" y="76" width="192" height="96" rx="6" fill="#F7F6F2"/>
+        <rect x="516" y="76" width="192" height="96" rx="6" fill="#c59216" fill-opacity="0.12" stroke="#C59216" stroke-width="1.6"/>
+        <rect x="528" y="84" width="52" height="14" rx="2" fill="none" stroke="#C59216" stroke-width="0.8"/>
+        <text x="554" y="94" fill="#9A6F0B" font-size="7" font-weight="600" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.08em">REWARD</text>
+        <text x="612" y="122" fill="#0F2547" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">Ventaja Relativa Grupal</text>
+        <text x="612" y="140" fill="#9A6F0B" font-size="9" font-weight="600" font-family="'Geist Mono', monospace" text-anchor="middle">A_i = (r_i - μ_G) / (σ_G + ε)</text>
+        <text x="612" y="156" fill="#3B5B8C" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle">Recompensa XML + Léxico ES</text>
+
+        <!-- Node 5: Clipped Policy Gradient + Schulman KL Penalty (Focal Node 2) -->
+        <rect x="748" y="176" width="180" height="104" rx="6" fill="#F7F6F2"/>
+        <rect x="748" y="176" width="180" height="104" rx="6" fill="#c59216" fill-opacity="0.12" stroke="#C59216" stroke-width="1.6"/>
+        <rect x="760" y="184" width="44" height="14" rx="2" fill="none" stroke="#C59216" stroke-width="0.8"/>
+        <text x="782" y="194" fill="#9A6F0B" font-size="7" font-weight="600" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.08em">LOSS</text>
+        <text x="838" y="222" fill="#0F2547" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">Objetivo GRPO + KL</text>
+        <text x="838" y="240" fill="#9A6F0B" font-size="9" font-weight="600" font-family="'Geist Mono', monospace" text-anchor="middle">clip(ρ_t, 1±ε)A_i - β·D_KL</text>
+        <text x="838" y="256" fill="#3B5B8C" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle">DiffState(0, LoRAParam)</text>
+
+        <!-- Editorial Callout Annotation -->
+        <text x="32" y="424" fill="#0F2547" font-size="13" font-style="italic" font-family="'Instrument Serif', serif">
+          Al normalizar recompensas dentro del grupo G, GRPO elimina por completo la red Value/Crítico de PPO y reduce el consumo de HBM en TPU v5e.
+        </text>
+
+        <!-- Horizontal Legend Strip at Bottom -->
+        <line x1="32" y1="468" x2="928" y2="468" stroke="#3B5B8C" stroke-width="0.8" opacity="0.35"/>
+        <text x="32" y="492" fill="#3B5B8C" font-size="8" font-weight="600" font-family="'Geist Mono', monospace" letter-spacing="0.14em">LEYENDA</text>
+
+        <rect x="116" y="482" width="14" height="14" rx="2" fill="#c59216" fill-opacity="0.12" stroke="#C59216" stroke-width="1.4"/>
+        <text x="138" y="492" fill="#0F2547" font-size="9" font-family="'Geist', sans-serif">Cálculo Focal GRPO (Ventaja Grupal y Objetivo)</text>
+
+        <rect x="388" y="482" width="14" height="14" rx="2" fill="#EFECE6" stroke="#3B5B8C" stroke-width="1.2"/>
+        <text x="410" y="492" fill="#0F2547" font-size="9" font-family="'Geist', sans-serif">Referencia Congelada (Sin Gradientes)</text>
+
+        <line x1="628" y1="489" x2="660" y2="489" stroke="#C59216" stroke-width="1.8" marker-end="url(#d-02-grpo-dataflow-arrow-accent)"/>
+        <text x="670" y="492" fill="#0F2547" font-size="9" font-family="'Geist', sans-serif">Ruta de Ventaja y Actualización LoRA</text>
+      </svg>

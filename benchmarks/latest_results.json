@@ -1,0 +1,193 @@
+{
+  "project": "gemma-tunix-spanish-posttraining",
+  "gcp_project_id": "ai-experiments-487722",
+  "all_checks_passed": true,
+  "execution_time_seconds": 16.076,
+  "checks": {
+    "multi_device_mesh_active": true,
+    "weight_shard_compression_2x": true,
+    "logit_softcap_respected": true,
+    "lora_reduction_above_90pct": true,
+    "base_weights_frozen_step": true,
+    "lora_adapters_updated": true,
+    "grpo_reward_improved": true,
+    "grpo_format_compliance_improved": true,
+    "grpo_base_weights_frozen": true
+  },
+  "stage_01_mesh": {
+    "backend": "cpu",
+    "num_devices": 4,
+    "mesh_shape": {
+      "data": 2,
+      "model": 2
+    },
+    "axis_names": [
+      "data",
+      "model"
+    ],
+    "tokens_global_shape": [
+      8,
+      64
+    ],
+    "tokens_shard_shape": [
+      4,
+      64
+    ],
+    "q_kernel_global_shape": [
+      256,
+      256
+    ],
+    "q_kernel_shard_shape": [
+      256,
+      128
+    ],
+    "down_kernel_global_shape": [
+      1024,
+      256
+    ],
+    "down_kernel_shard_shape": [
+      512,
+      256
+    ],
+    "norm_scale_shard_shape": [
+      256
+    ],
+    "q_kernel_full_bytes": 262144,
+    "q_kernel_shard_bytes": 131072,
+    "per_device_weight_compression_ratio": 2.0
+  },
+  "stage_02_gemma_nnx": {
+    "total_params": 4198656,
+    "num_layers": 4,
+    "embed_dim": 256,
+    "num_heads": 4,
+    "num_kv_heads": 2,
+    "gqa_ratio": 2,
+    "logits_shape": [
+      4,
+      16,
+      512
+    ],
+    "logits_max_abs": 3.737159490585327,
+    "softcap_bound": 30.0,
+    "q_kernel_global_shape": [
+      256,
+      256
+    ],
+    "q_kernel_shard_shape": [
+      256,
+      128
+    ],
+    "down_kernel_global_shape": [
+      1024,
+      256
+    ],
+    "down_kernel_shard_shape": [
+      512,
+      256
+    ]
+  },
+  "stage_03_surgical_lora": {
+    "base_params": 4198656,
+    "lora_params": 90112,
+    "total_params": 4288768,
+    "trainable_ratio_pct": 2.1011162179908074,
+    "reduction_pct": 97.8988837820092,
+    "lora_rank": 4,
+    "loss_before": 7.083991050720215,
+    "loss_after": 6.391797065734863,
+    "max_base_weight_diff": 0.0,
+    "max_lora_weight_diff": 0.002999980002641678,
+    "base_weights_frozen_bitwise": true,
+    "lora_weights_updated": true
+  },
+  "stage_04_05_grpo_acid_test": {
+    "base_mean_reward": -0.0625,
+    "grpo_mean_reward": 1.4875,
+    "reward_delta": 1.55,
+    "base_format_compliance_pct": 0.0,
+    "grpo_format_compliance_pct": 75.0,
+    "compliance_delta_pct": 75.0,
+    "max_base_weight_diff": 0.0,
+    "cases": [
+      {
+        "prompt_id": "tpu_mesh_2d",
+        "prompt_text": "Explica cómo la malla 2D en TPU v5e particiona tensores y reduce memoria HBM.",
+        "base_output": "congelan tensores </respuesta> bajo datos nnx hbm tensores normaliza grupo",
+        "grpo_output": "<razonamiento> malla particiona tensores </razonamiento> <respuesta> estabiliza </respuesta> reduce memoria",
+        "base_reward": 0.0,
+        "grpo_reward": 1.7,
+        "reward_delta": 1.7
+      },
+      {
+        "prompt_id": "lora_surgical",
+        "prompt_text": "Describe por qué los adaptadores LoRA de rango bajo congelan los pesos base.",
+        "base_output": "<pad> nnx kl modelo <pad> divergencia datos datos datos datos",
+        "grpo_output": "<razonamiento> adaptadores lora congelan pesos </razonamiento> <respuesta> estabiliza </respuesta> kl",
+        "base_reward": -0.1,
+        "grpo_reward": 1.85,
+        "reward_delta": 1.9500000000000002
+      },
+      {
+        "prompt_id": "grpo_critic_free",
+        "prompt_text": "Analiza cómo GRPO normaliza recompensas por grupo y elimina el modelo crítico.",
+        "base_output": "divergencia pesos reduce grafo congelan normaliza pesos </razonamiento> xla pesos",
+        "grpo_output": "<razonamiento> grpo normaliza recompensas elimina critico </razonamiento> <respuesta> estabiliza </respuesta>",
+        "base_reward": -0.05,
+        "grpo_reward": 2.0,
+        "reward_delta": 2.05
+      },
+      {
+        "prompt_id": "nnx_split_state",
+        "prompt_text": "Detalla cómo Flax NNX separa el grafo y el estado para compilación XLA.",
+        "base_output": "modelo reduce tpu normaliza politica politica politica politica v5e <respuesta>",
+        "grpo_output": "<razonamiento> flax nnx separa estado grafo </respuesta> <razonamiento> flax </razonamiento>",
+        "base_reward": -0.1,
+        "grpo_reward": 0.4,
+        "reward_delta": 0.5
+      }
+    ],
+    "history": [
+      {
+        "step": 1,
+        "loss": -0.03793468698859215,
+        "kl_divergence": 1.3823127746582031,
+        "group_mean_reward": 0.4593750238418579,
+        "greedy_eval_reward": 1.2,
+        "format_compliance_rate": 0.5
+      },
+      {
+        "step": 6,
+        "loss": 0.02561936341226101,
+        "kl_divergence": 2.3891289234161377,
+        "group_mean_reward": 0.5718749761581421,
+        "greedy_eval_reward": 0.8,
+        "format_compliance_rate": 0.25
+      },
+      {
+        "step": 12,
+        "loss": 0.04242081567645073,
+        "kl_divergence": 2.470508098602295,
+        "group_mean_reward": 0.6937500238418579,
+        "greedy_eval_reward": 0.8,
+        "format_compliance_rate": 0.25
+      },
+      {
+        "step": 18,
+        "loss": 0.04945879057049751,
+        "kl_divergence": 2.799327850341797,
+        "group_mean_reward": 1.0625,
+        "greedy_eval_reward": 1.4875,
+        "format_compliance_rate": 0.75
+      },
+      {
+        "step": 24,
+        "loss": 0.04585838317871094,
+        "kl_divergence": 2.5481395721435547,
+        "group_mean_reward": 1.0718750953674316,
+        "greedy_eval_reward": 1.4875,
+        "format_compliance_rate": 0.75
+      }
+    ]
+  }
+}

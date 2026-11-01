@@ -1,0 +1,13 @@
+title = "Gitleaks Configuration for gemma-tunix-spanish-posttraining"
+
+[extend]
+useDefault = true
+
+[allowlist]
+description = "Allow documentation placeholders and non-secret project IDs"
+paths = [
+  '''^\.gitleaks\.toml$'''
+]
+regexes = [
+  '''ai-experiments-487722'''
+]

@@ -1,0 +1,34 @@
+[project]
+name = "gemma-tunix-spanish-posttraining"
+version = "0.1.0"
+description = "Post-training alignment of Gemma architectures in Spanish using Flax NNX, surgical LoRA adapters, and Group Relative Policy Optimization (GRPO) on Cloud TPU v5e."
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+authors = [
+  { name = "Adrián Catalán", email = "ykro@galileo.edu" }
+]
+dependencies = [
+  "jax>=0.9.0",
+  "flax>=0.12.0",
+  "optax>=0.2.4",
+  "numpy>=2.0.0",
+]
+
+[project.optional-dependencies]
+dev = [
+  "pytest>=8.0.0",
+  "ruff>=0.8.0",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+addopts = "-v"
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "W"]
