@@ -1,14 +1,14 @@
 #!/usr/bin/env bash
 # ==============================================================================
 # Ephemeral Cloud TPU v5e Post-Training Runner (Gemma + Flax NNX + Tunix GRPO)
-# Project: ai-experiments-487722
+# Project: your own (set PROJECT_ID)
 # Guarantee: Zero idle TPU billing via mandatory EXIT trap cleanup
 # ==============================================================================
 set -euo pipefail
 
 export CLOUDSDK_METRICS_ENVIRONMENT="${CLOUDSDK_METRICS_ENVIRONMENT:+$CLOUDSDK_METRICS_ENVIRONMENT }datacloud.antigravity"
 
-PROJECT_ID="${PROJECT_ID:-ai-experiments-487722}"
+PROJECT_ID="${PROJECT_ID:?Set PROJECT_ID to your Google Cloud project id}"
 ZONE="${ZONE:-us-central1-a}"
 ACCELERATOR_TYPE="${ACCELERATOR_TYPE:-v5litepod-4}"
 RUNTIME_VERSION="${RUNTIME_VERSION:-v2-alpha-tpuv5-lite}"

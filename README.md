@@ -11,7 +11,7 @@ Parte de la serie **[JAX & OpenXLA Field Guide](https://github.com/ykro/jax-open
 
 ![Pipeline On-Demand de Post-Training para Gemma en Español](diagrams/01-tpu-posttraining-pipeline.png)
 
-El repositorio implementa de principio a fin las cinco etapas de un pipeline de alineación post-training sobre Google Cloud (`ai-experiments-487722`), diseñado para ejecutarse de forma idéntica en una simulación local de 4 dispositivos XLA (`--xla_force_host_platform_device_count=4`) y en una instancia on-demand `v5litepod-4` en `us-central1-a`:
+El repositorio implementa de principio a fin las cinco etapas de un pipeline de alineación post-training sobre Google Cloud, diseñado para ejecutarse de forma idéntica en una simulación local de 4 dispositivos XLA (`--xla_force_host_platform_device_count=4`) y en una instancia on-demand `v5litepod-4` en `us-central1-a`:
 
 1. **`experiments/01_ephemeral_tpu_mesh.py` — Mesh 2D `('data', 'model')` en OpenXLA**: Construye un `jax.sharding.Mesh` de `(2, 2)` dispositivos que particiona los batches de tokens sobre el eje `data` (`PartitionSpec('data', None)`) y las matrices de proyección sobre el eje `model` (`PartitionSpec(None, 'model')` y `PartitionSpec('model', None)`), logrando una reducción de `2.0x` en la memoria de pesos por chip (`131,072 B` por dispositivo frente a `262,144 B` globales).
 2. **`experiments/02_gemma_nnx_architecture.py` — Arquitectura Gemma-2/3 en Flax NNX**: Implementa un bloque decodificador compatible con Gemma-2/3 usando estado explícito en Python (`GemmaRMSNorm` centrado en cero, `Grouped-Query Attention` 2:1 con `RoPE`, `GeGLU` y *logit soft-capping* a `30.0`).
@@ -128,12 +128,12 @@ python experiments/05_acid_test_evaluation.py
 make all
 ```
 
-### 3. Ejecución On-Demand en Google Cloud TPU v5e (`ai-experiments-487722`)
+### 3. Ejecución On-Demand en Google Cloud TPU v5e
 
 El script `gcp/run_ephemeral_tpu_v5e.sh` aprovisiona una TPU VM Spot `v5litepod-4` en `us-central1-a`, sincroniza el código, ejecuta la suite completa, sube los artefactos a Cloud Storage y destruye la TPU VM automáticamente al salir gracias a `trap cleanup EXIT`.
 
 ```bash
-PROJECT_ID=ai-experiments-487722 ZONE=us-central1-a ./gcp/run_ephemeral_tpu_v5e.sh
+PROJECT_ID=<tu-proyecto> ZONE=us-central1-a ./gcp/run_ephemeral_tpu_v5e.sh
 ```
 
 ---

@@ -1,6 +1,5 @@
 {
   "project": "gemma-tunix-spanish-posttraining",
-  "gcp_project_id": "ai-experiments-487722",
   "all_checks_passed": true,
   "execution_time_seconds": 16.076,
   "checks": {

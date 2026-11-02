@@ -67,7 +67,6 @@ def run_verification_suite() -> dict[str, Any]:
 
     results = {
         "project": "gemma-tunix-spanish-posttraining",
-        "gcp_project_id": "ai-experiments-487722",
         "all_checks_passed": all_passed,
         "execution_time_seconds": round(elapsed_s, 3),
         "checks": checks,
