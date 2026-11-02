@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <svg viewBox="0 0 960 540" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="tpu-mesh-sharding-title tpu-mesh-sharding-desc" id="d-03-tpu-mesh-sharding-root">
         <title id="tpu-mesh-sharding-title">Topología 2D jax.sharding.Mesh((data, model)) en TPU v5e</title>
-        <desc id="tpu-mesh-sharding-desc">Diagrama anidado de sharding 2D en OpenXLA que sample cómo un mesh de 2 por 2 dispositivos divide batches de datos en el eje data y tensores de pesos Gemma y LoRA en el eje model.</desc>
+        <desc id="tpu-mesh-sharding-desc">Diagrama anidado de sharding 2D en OpenXLA que muestra cómo un mesh de 2 por 2 dispositivos divide batches de datos en el eje data y tensores de pesos Gemma y LoRA en el eje model.</desc>
         <defs>
       <style>@import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&amp;family=Geist:wght@400;500;600&amp;family=Geist+Mono:wght@400;500;600&amp;family=Noto+Serif:ital@0;1&amp;family=Noto+Sans+KR:wght@400;500;600&amp;family=Noto+Serif+KR:wght@400&amp;family=Noto+Sans+TC:wght@400;500;600&amp;family=Noto+Serif+TC:wght@400&amp;display=swap');
       #d-03-tpu-mesh-sharding-root { --color-paper:   #F7F6F2;

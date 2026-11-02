@@ -5,7 +5,7 @@
             Batch Token Sharding       : global=(8, 64) -> shard=(4, 64)
             Q-Proj Weight Sharding     : global=(256, 256) -> shard=(256, 128) (2.0x memory reduction)
 ------------------------------------------------------------------------------
- [STAGE 02] Gemma-2/3 Flax NNX Model   : 4,198,656 base parameters (4 layers, d_model=256)
+ [STAGE 02] Gemma 2 style NNX Model    : 4,198,656 base parameters (4 layers, d_model=256)
             GQA & Soft-Capping         : 4Q/2KV (2:1 GQA), max |logit|=3.737 <= 30.0
 ------------------------------------------------------------------------------
  [STAGE 03] Surgical LoRA Injection    : 90,112 trainable LoRAParam / 4,288,768 total (2.10% trainable, 97.90% reduction)

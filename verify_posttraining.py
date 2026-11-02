@@ -1,9 +1,10 @@
 """The Outside Judge (verify_posttraining.py).
 
-Independently executes and audits all 5 stages of the Gemma + Tunix Spanish
-post-training pipeline on a 4-device XLA mesh:
+Independently executes and audits all 5 stages of the Gemma-style, Tunix-style
+Spanish post-training pipeline (Tunix is not imported; GRPO is written by hand)
+on a 4-device XLA mesh:
   1. 2D ('data', 'model') XLA Mesh Sharding & Memory Compression
-  2. Gemma-2/3 Flax NNX Architecture (GQA, GeGLU, RoPE, Soft-Capping)
+  2. Gemma 2 style Flax NNX Architecture (GQA, GeGLU, RoPE, Soft-Capping)
   3. Surgical LoRA Injection (>90% reduction & bitwise frozen base weights)
   4. Critic-Free GRPO Group Advantage Normalization & KL Regularization
   5. Spanish Acid Test Benchmark (Base vs. LoRA+GRPO Alignment)
@@ -88,7 +89,7 @@ def run_verification_suite() -> dict[str, Any]:
         f"-> shard={mesh_stats['q_kernel_shard_shape']} "
         f"({mesh_stats['per_device_weight_compression_ratio']:.1f}x memory reduction)",
         "-" * 78,
-        f" [STAGE 02] Gemma-2/3 Flax NNX Model   : {gemma_stats['total_params']:,} base parameters "
+        f" [STAGE 02] Gemma 2 style NNX Model    : {gemma_stats['total_params']:,} base parameters "
         f"({gemma_stats['num_layers']} layers, d_model={gemma_stats['embed_dim']})",
         f"            GQA & Soft-Capping         : "
         f"{gemma_stats['num_heads']}Q/{gemma_stats['num_kv_heads']}KV "

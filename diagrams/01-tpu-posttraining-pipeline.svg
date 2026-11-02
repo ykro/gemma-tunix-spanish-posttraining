@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <svg viewBox="0 0 960 540" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="tpu-posttraining-pipeline-title tpu-posttraining-pipeline-desc" id="d-01-tpu-posttraining-pipeline-root">
-        <title id="tpu-posttraining-pipeline-title">Pipeline On-Demand de Post-Training para Gemma en Español</title>
+        <title id="tpu-posttraining-pipeline-title">Pipeline On-Demand de Post-Training estilo Gemma en Español</title>
         <desc id="tpu-posttraining-pipeline-desc">Arquitectura del pipeline on-demand en Cloud TPU v5e que aprovisiona el mesh XLA, inyecta adaptadores LoRA en Gemma sobre Flax NNX, alinea con GRPO y destruye la VM mediante trap EXIT.</desc>
         <defs>
       <style>@import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&amp;family=Geist:wght@400;500;600&amp;family=Geist+Mono:wght@400;500;600&amp;family=Noto+Serif:ital@0;1&amp;family=Noto+Sans+KR:wght@400;500;600&amp;family=Noto+Serif+KR:wght@400&amp;family=Noto+Sans+TC:wght@400;500;600&amp;family=Noto+Serif+TC:wght@400&amp;display=swap');
@@ -30,7 +30,7 @@
 
         <!-- Ephemeral Cloud TPU v5e Zone Container -->
         <rect x="260" y="36" width="432" height="392" rx="6" fill="#EFECE6" stroke="#3B5B8C" stroke-width="1" stroke-dasharray="5,4"/>
-        <text x="276" y="56" fill="#3B5B8C" font-size="9" font-weight="600" font-family="'Geist Mono', monospace" letter-spacing="0.12em">EPHEMERAL CLOUD TPU V5E VM · US-CENTRAL1-A (TRAP EXIT)</text>
+        <text x="276" y="56" fill="#3B5B8C" font-size="9" font-weight="600" font-family="'Geist Mono', monospace" letter-spacing="0.12em">ON-DEMAND CLOUD TPU V5E VM · SCRIPT (CIFRAS EN CPU SIMULADO)</text>
 
         <!-- Connectors (drawn before nodes) -->
         <!-- 1. CLI Orchestrator -> Gemma Base in Flax NNX -->
@@ -91,7 +91,7 @@
         <rect x="276" y="88" width="176" height="96" rx="6" fill="#FFFFFF" stroke="#0F2547" stroke-width="1.2"/>
         <rect x="288" y="96" width="40" height="12" rx="2" fill="none" stroke="#3B5B8C" stroke-width="0.8"/>
         <text x="308" y="105" fill="#3B5B8C" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.08em">BASE</text>
-        <text x="364" y="134" fill="#0F2547" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">Gemma-2/3 Flax NNX</text>
+        <text x="364" y="134" fill="#0F2547" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">Estilo Gemma 2 en NNX</text>
         <text x="364" y="152" fill="#3B5B8C" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">GQA 2:1 · GeGLU · RoPE</text>
         <text x="364" y="168" fill="#3B5B8C" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle">Base Param Congelados</text>
 
@@ -102,14 +102,14 @@
         <text x="308" y="289" fill="#9A6F0B" font-size="7" font-weight="600" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.08em">LORA</text>
         <text x="364" y="318" fill="#0F2547" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">Inyección LoRA NNX</text>
         <text x="364" y="336" fill="#9A6F0B" font-size="9" font-weight="600" font-family="'Geist Mono', monospace" text-anchor="middle">2.10% params entrenables</text>
-        <text x="364" y="352" fill="#3B5B8C" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle">97.90% reducción HBM</text>
+        <text x="364" y="352" fill="#3B5B8C" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle">97.90% menos entrenables</text>
 
         <!-- Node 5: Tunix GRPO Alignment Engine (Focal Node 2) -->
         <rect x="504" y="176" width="172" height="104" rx="6" fill="#F7F6F2"/>
         <rect x="504" y="176" width="172" height="104" rx="6" fill="#c59216" fill-opacity="0.12" stroke="#C59216" stroke-width="1.6"/>
         <rect x="516" y="184" width="40" height="12" rx="2" fill="none" stroke="#C59216" stroke-width="0.8"/>
         <text x="536" y="193" fill="#9A6F0B" font-size="7" font-weight="600" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.08em">GRPO</text>
-        <text x="590" y="222" fill="#0F2547" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">Alineación Tunix GRPO</text>
+        <text x="590" y="222" fill="#0F2547" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">GRPO estilo Tunix</text>
         <text x="590" y="240" fill="#9A6F0B" font-size="9" font-weight="600" font-family="'Geist Mono', monospace" text-anchor="middle">Rollout G=4 · Sin Crítico</text>
         <text x="590" y="256" fill="#3B5B8C" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle">Ventaja Relativa + KL</text>
 
@@ -120,7 +120,7 @@
         <text x="792" y="105" fill="#3B5B8C" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.08em">EVAL</text>
         <text x="844" y="134" fill="#0F2547" font-size="12" font-weight="600" font-family="'Geist', sans-serif" text-anchor="middle">Prueba Ácida ES</text>
         <text x="844" y="152" fill="#3B5B8C" font-size="9" font-family="'Geist Mono', monospace" text-anchor="middle">verify_posttraining.py</text>
-        <text x="844" y="168" fill="#3B5B8C" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle">100% formato XML válido</text>
+        <text x="844" y="168" fill="#3B5B8C" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle">75% formato XML (4 prompts)</text>
 
         <!-- Node 7: GCS Checkpoint & Telemetry Store -->
         <rect x="760" y="272" width="168" height="96" rx="6" fill="#F7F6F2"/>
@@ -136,7 +136,7 @@
         <text x="32" y="492" fill="#3B5B8C" font-size="8" font-weight="600" font-family="'Geist Mono', monospace" letter-spacing="0.14em">LEYENDA</text>
 
         <rect x="116" y="482" width="14" height="14" rx="2" fill="#c59216" fill-opacity="0.12" stroke="#C59216" stroke-width="1.4"/>
-        <text x="138" y="492" fill="#0F2547" font-size="9" font-family="'Geist', sans-serif">Núcleo Focal (LoRA + Tunix GRPO)</text>
+        <text x="138" y="492" fill="#0F2547" font-size="9" font-family="'Geist', sans-serif">Núcleo Focal (LoRA + GRPO a mano)</text>
 
         <rect x="336" y="482" width="14" height="14" rx="2" fill="#FFFFFF" stroke="#0F2547" stroke-width="1.2"/>
         <text x="358" y="492" fill="#0F2547" font-size="9" font-family="'Geist', sans-serif">Componente Base / Almacenamiento</text>

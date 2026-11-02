@@ -1,6 +1,6 @@
-"""Experiment 02: Gemma-2/3 Architecture in Flax NNX with 2D Mesh Sharding.
+"""Experiment 02: Gemma 2 style Architecture in Flax NNX with 2D Mesh Sharding.
 
-Implements a Gemma-2/3 compatible causal Transformer in Flax NNX featuring:
+Implements a Gemma 2 style causal Transformer (random weights, no checkpoint) in Flax NNX featuring:
   - Zero-centered GemmaRMSNorm: x * rsqrt(mean(x^2) + eps) * (1.0 + scale)
   - Grouped-Query Attention (GQA) with Rotary Position Embeddings (RoPE)
   - Attention and Final Logit Soft-Capping: cap * tanh(logits / cap)
@@ -37,7 +37,7 @@ def _load_mesh_module():
 
 @dataclass(frozen=True)
 class GemmaConfig:
-    """Configuration for Gemma-2/3 style architecture in Flax NNX."""
+    """Configuration for a Gemma 2 style architecture in Flax NNX."""
 
     vocab_size: int = 512
     embed_dim: int = 256
@@ -201,7 +201,7 @@ class GemmaDecoderBlock(nnx.Module):
 
 
 class GemmaForCausalLM(nnx.Module):
-    """Gemma-2/3 Causal Language Model in Flax NNX."""
+    """Gemma 2 style Causal Language Model in Flax NNX."""
 
     def __init__(self, config: GemmaConfig, *, rngs: nnx.Rngs) -> None:
         self.config = config
@@ -320,7 +320,7 @@ def verify_gemma_architecture() -> dict[str, Any]:
 def main() -> None:
     stats = verify_gemma_architecture()
     print("=" * 72)
-    print(" Experiment 02: Gemma-2/3 Flax NNX Architecture & Sharding")
+    print(" Experiment 02: Gemma 2 style Flax NNX Architecture & Sharding")
     print("=" * 72)
     print(f" Total Parameters          : {stats['total_params']:,}")
     print(

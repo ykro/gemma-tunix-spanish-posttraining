@@ -1,1 +1,1 @@
-"""Gemma + Tunix Spanish Post-Training experiments in JAX and Flax NNX."""
+"""Gemma-style, Tunix-style Spanish post-training experiments in JAX and Flax NNX."""

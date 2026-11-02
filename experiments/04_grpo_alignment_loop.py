@@ -1,6 +1,7 @@
 """Experiment 04: Group Relative Policy Optimization (GRPO) in JAX & Flax NNX.
 
-Implements the critic-free GRPO post-training loop (as used in Google Tunix):
+Implements the critic-free GRPO post-training loop by hand, following the recipe used
+by Google Tunix (Tunix itself is not imported):
   1. Group Rollout: Samples G candidate completions per Spanish prompt from policy pi_theta.
   2. Deterministic Spanish Reward: Evaluates XML structure (<razonamiento>...</razonamiento>
      <respuesta>...</respuesta>) and Spanish technical reasoning density.
@@ -361,7 +362,8 @@ def run_grpo_alignment(
     initial_eval = evaluate_greedy_policy(policy_model)
 
     # Stage 4A: Brief format warmup (SFT cold-start, standard in Tunix/DeepSeek-R1 before GRPO)
-    # so the randomly initialized 4.2M demo model has non-zero probability of emitting XML tags
+    # so the randomly initialized 2-layer demo policy (312,448 base params) has non-zero
+    # probability of emitting XML tags
     # during purely on-policy autoregressive group sampling.
     warmup_seqs = jnp.array(
         [p.prompt_tokens + p.exemplar_completion for p in prompts], dtype=jnp.int32
