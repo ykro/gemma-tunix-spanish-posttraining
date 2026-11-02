@@ -126,9 +126,10 @@ def inspect_mesh_topology(
 def main() -> None:
     info = inspect_mesh_topology()
     print("=" * 72)
-    print(" Experiment 01: Ephemeral 2D XLA Mesh ('data', 'model') Verification")
+    print(" Experiment 01: 2D XLA Mesh ('data', 'model') over 4 devices")
     print("=" * 72)
-    print(f" XLA Backend               : {info['backend']}")
+    sim_note = " (simulated host devices)" if info["backend"] == "cpu" else ""
+    print(f" XLA Backend               : {info['backend']}{sim_note}")
     print(f" Total XLA Devices         : {info['num_devices']}")
     print(f" 2D Mesh Topology          : {info['mesh_shape']}")
     print(
@@ -144,9 +145,10 @@ def main() -> None:
         f"-> per-device shard={info['down_kernel_shard_shape']} P('model', None)"
     )
     print(
-        f" Per-Device Weight Memory  : {info['q_kernel_shard_bytes']} B / "
+        f" Q-Proj Bytes per Device   : {info['q_kernel_shard_bytes']} B / "
         f"{info['q_kernel_full_bytes']} B "
-        f"({info['per_device_weight_compression_ratio']:.1f}x reduction along model axis)"
+        f"({info['per_device_weight_compression_ratio']:.1f}x fewer, PartitionSpec arithmetic; "
+        f"HBM not measured)"
     )
     print("=" * 72)
 

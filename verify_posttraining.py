@@ -3,11 +3,11 @@
 Independently executes and audits all 5 stages of the Gemma-style, Tunix-style
 Spanish post-training pipeline (Tunix is not imported; GRPO is written by hand)
 on a 4-device XLA mesh:
-  1. 2D ('data', 'model') XLA Mesh Sharding & Memory Compression
+  1. 2D ("data", "model") XLA Mesh Sharding (bytes per device by PartitionSpec)
   2. Gemma 2 style Flax NNX Architecture (GQA, GeGLU, RoPE, Soft-Capping)
   3. Surgical LoRA Injection (>90% reduction & bitwise frozen base weights)
   4. Critic-Free GRPO Group Advantage Normalization & KL Regularization
-  5. Spanish Acid Test Benchmark (Base vs. LoRA+GRPO Alignment)
+  5. Acid Test on the 4 training prompts (Base vs. LoRA SFT warmup + GRPO)
 
 Writes real, reproducible telemetry to:
   - benchmarks/latest_results.json
@@ -82,12 +82,14 @@ def run_verification_suite() -> dict[str, Any]:
         " OUTSIDE JUDGE VERIFICATION: gemma-tunix-spanish-posttraining",
         "=" * 78,
         f" [STAGE 01] 2D XLA Mesh Topology       : {mesh_stats['num_devices']} devices "
-        f"{mesh_stats['mesh_shape']} (backend={mesh_stats['backend']})",
+        f"{mesh_stats['mesh_shape']} (backend={mesh_stats['backend']}"
+        f"{', simulated' if mesh_stats['backend'] == 'cpu' else ''})",
         f"            Batch Token Sharding       : global={mesh_stats['tokens_global_shape']} "
         f"-> shard={mesh_stats['tokens_shard_shape']}",
         f"            Q-Proj Weight Sharding     : global={mesh_stats['q_kernel_global_shape']} "
         f"-> shard={mesh_stats['q_kernel_shard_shape']} "
-        f"({mesh_stats['per_device_weight_compression_ratio']:.1f}x memory reduction)",
+        f"({mesh_stats['per_device_weight_compression_ratio']:.1f}x fewer bytes/device, "
+        f"PartitionSpec arithmetic)",
         "-" * 78,
         f" [STAGE 02] Gemma 2 style NNX Model    : {gemma_stats['total_params']:,} base parameters "
         f"({gemma_stats['num_layers']} layers, d_model={gemma_stats['embed_dim']})",
@@ -100,7 +102,7 @@ def run_verification_suite() -> dict[str, Any]:
         f"{lora_stats['lora_params']:,} trainable LoRAParam / "
         f"{lora_stats['total_params']:,} total "
         f"({lora_stats['trainable_ratio_pct']:.2f}% trainable, "
-        f"{lora_stats['reduction_pct']:.2f}% reduction)",
+        f"{lora_stats['reduction_pct']:.2f}% frozen)",
         f"            Base Parameter Drift       : "
         f"max |diff| = {lora_stats['max_base_weight_diff']:.8f} "
         f"(bitwise frozen = {lora_stats['base_weights_frozen_bitwise']})",
@@ -110,26 +112,31 @@ def run_verification_suite() -> dict[str, Any]:
         "-" * 78,
         " [STAGE 04] Critic-Free GRPO Loop      : "
         "G=4 group rollouts/prompt, 24 steps, KL beta=0.04",
+        f"            SFT warmup ({acid_stats['num_sft_warmup_steps']} steps)       : "
+        f"greedy_reward={acid_stats['post_sft_mean_reward']:+.4f} | "
+        f"XML_compliance={acid_stats['post_sft_format_compliance_pct']:.0f}% "
+        "(before any GRPO step)",
     ]
     for h in acid_stats["history"]:
         lines.append(
             f"            Step {h['step']:02d}                    : "
             f"loss={h['loss']:+.4f} | KL={h['kl_divergence']:.4f} | "
-            f"eval_reward={h['greedy_eval_reward']:+.4f} | "
+            f"group_reward={h['group_mean_reward']:+.4f} | "
+            f"greedy_reward={h['greedy_eval_reward']:+.4f} | "
             f"XML_compliance={h['format_compliance_rate'] * 100:.0f}%"
         )
     lines.extend(
         [
             "-" * 78,
-            f" [STAGE 05] Spanish Acid Test Summary  : "
-            f"Reward {acid_stats['base_mean_reward']:+.4f} -> "
+            f" [STAGE 05] Acid Test (4 train prompts): "
+            f"Greedy reward {acid_stats['base_mean_reward']:+.4f} -> "
             f"{acid_stats['grpo_mean_reward']:+.4f} "
             f"(Delta {acid_stats['reward_delta']:+.4f})",
             f"            XML Format Compliance      : "
             f"{acid_stats['base_format_compliance_pct']:.1f}% -> "
             f"{acid_stats['grpo_format_compliance_pct']:.1f}% "
             f"(+{acid_stats['compliance_delta_pct']:.1f}%)",
-            f"            Post-GRPO Base Weight Drift: "
+            f"            Base Weight Drift (end)    : "
             f"max |diff| = {acid_stats['max_base_weight_diff']:.8f}",
             "-" * 78,
         ]
@@ -137,7 +144,7 @@ def run_verification_suite() -> dict[str, Any]:
     for case in acid_stats["cases"]:
         lines.append(f"   Prompt [{case['prompt_id']}] : {case['prompt_text']}")
         lines.append(f"     Base ({case['base_reward']:+.2f}) : {case['base_output']}")
-        lines.append(f"     GRPO ({case['grpo_reward']:+.2f}) : {case['grpo_output']}")
+        lines.append(f"     SFT+GRPO ({case['grpo_reward']:+.2f}) : {case['grpo_output']}")
     lines.extend(
         [
             "=" * 78,

@@ -381,8 +381,14 @@ def run_grpo_alignment(
         opt.update(mdl, grads)
         return loss_v
 
-    for _ in range(4):
+    num_sft_warmup_steps = 4
+    for _ in range(num_sft_warmup_steps):
         _ = sft_warmup_step(policy_model, optimizer, warmup_seqs)
+
+    # Greedy decoding is deterministic and does not touch the PRNG or the optimizer,
+    # so measuring here does not change the GRPO trajectory. It separates how much of
+    # the final gain comes from the SFT warmup and how much from GRPO itself.
+    post_sft_eval = evaluate_greedy_policy(policy_model)
 
     @nnx.jit
     def compute_frozen_log_probs(mdl: Any, full_seqs: jax.Array) -> jax.Array:
@@ -467,7 +473,9 @@ def run_grpo_alignment(
         "group_size": group_size,
         "lora_rank": lora_rank,
         "kl_beta": kl_beta,
+        "num_sft_warmup_steps": num_sft_warmup_steps,
         "initial_eval": initial_eval,
+        "post_sft_eval": post_sft_eval,
         "final_eval": final_eval,
         "history": history,
         "max_base_weight_diff": max_base_diff,
@@ -486,18 +494,24 @@ def main() -> None:
         f"{res['num_steps']} GRPO steps (KL beta={res['kl_beta']})"
     )
     print(
-        f" Pre-GRPO Greedy Reward    : {res['initial_eval']['mean_reward']:.4f} "
+        f" Greedy Reward, base       : {res['initial_eval']['mean_reward']:+.4f} "
         f"(XML format compliance: {res['initial_eval']['format_compliance_rate'] * 100:.1f}%)"
+    )
+    print(
+        f" Greedy Reward, after SFT  : {res['post_sft_eval']['mean_reward']:+.4f} "
+        f"(XML format compliance: {res['post_sft_eval']['format_compliance_rate'] * 100:.1f}%)"
+        f" <- {res['num_sft_warmup_steps']} SFT warmup steps, before any GRPO step"
     )
     for row in res["history"]:
         print(
             f"   [Step {row['step']:02d}] loss={row['loss']:+.4f} | "
             f"KL={row['kl_divergence']:.4f} | "
-            f"eval_reward={row['greedy_eval_reward']:+.4f} | "
+            f"group_reward={row['group_mean_reward']:+.4f} | "
+            f"greedy_reward={row['greedy_eval_reward']:+.4f} | "
             f"XML_compliance={row['format_compliance_rate'] * 100:.0f}%"
         )
     print(
-        f" Post-GRPO Greedy Reward   : {res['final_eval']['mean_reward']:.4f} "
+        f" Greedy Reward, SFT+GRPO   : {res['final_eval']['mean_reward']:+.4f} "
         f"(XML format compliance: {res['final_eval']['format_compliance_rate'] * 100:.1f}%)"
     )
     print(f" Base Weight Max |Diff|    : {res['max_base_weight_diff']:.8f}")

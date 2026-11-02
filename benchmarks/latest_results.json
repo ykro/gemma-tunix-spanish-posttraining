@@ -1,7 +1,7 @@
 {
   "project": "gemma-tunix-spanish-posttraining",
   "all_checks_passed": true,
-  "execution_time_seconds": 16.076,
+  "execution_time_seconds": 85.527,
   "checks": {
     "multi_device_mesh_active": true,
     "weight_shard_compression_2x": true,
@@ -102,6 +102,9 @@
   },
   "stage_04_05_grpo_acid_test": {
     "base_mean_reward": -0.0625,
+    "post_sft_mean_reward": 1.1375,
+    "post_sft_format_compliance_pct": 50.0,
+    "num_sft_warmup_steps": 4,
     "grpo_mean_reward": 1.4875,
     "reward_delta": 1.55,
     "base_format_compliance_pct": 0.0,

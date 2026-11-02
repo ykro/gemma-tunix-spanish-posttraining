@@ -165,7 +165,7 @@ def main() -> None:
     print(f" Total Parameters          : {res['total_params']:,}")
     print(
         f" Trainable Parameter Share : {res['trainable_ratio_pct']:.2f}% "
-        f"({res['reduction_pct']:.2f}% parameter reduction)"
+        f"({res['reduction_pct']:.2f}% of parameters frozen)"
     )
     print(f" Cross-Entropy Loss        : {res['loss_before']:.4f} -> {res['loss_after']:.4f}")
     print(

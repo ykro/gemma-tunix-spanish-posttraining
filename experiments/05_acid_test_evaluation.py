@@ -59,6 +59,11 @@ def run_acid_test_benchmark() -> dict[str, Any]:
 
     return {
         "base_mean_reward": float(initial_eval["mean_reward"]),
+        "post_sft_mean_reward": float(alignment_res["post_sft_eval"]["mean_reward"]),
+        "post_sft_format_compliance_pct": float(
+            alignment_res["post_sft_eval"]["format_compliance_rate"] * 100.0
+        ),
+        "num_sft_warmup_steps": int(alignment_res["num_sft_warmup_steps"]),
         "grpo_mean_reward": float(final_eval["mean_reward"]),
         "reward_delta": reward_delta,
         "base_format_compliance_pct": float(initial_eval["format_compliance_rate"] * 100.0),
@@ -73,23 +78,26 @@ def run_acid_test_benchmark() -> dict[str, Any]:
 def main() -> None:
     report = run_acid_test_benchmark()
     print("=" * 72)
-    print(" Experiment 05: Acid Test Evaluation (Base vs. LoRA + GRPO in Spanish)")
+    print(" Experiment 05: Acid Test (Base vs. LoRA SFT+GRPO, same 4 training prompts)")
     print("=" * 72)
     print(
-        f" Mean Benchmark Reward     : {report['base_mean_reward']:+.4f} (Base) -> "
-        f"{report['grpo_mean_reward']:+.4f} (GRPO) "
+        f" Mean Greedy Reward        : {report['base_mean_reward']:+.4f} (Base) -> "
+        f"{report['post_sft_mean_reward']:+.4f} (SFT warmup) -> "
+        f"{report['grpo_mean_reward']:+.4f} (SFT+GRPO) "
         f"[Delta: {report['reward_delta']:+.4f}]"
     )
     print(
-        f" XML Reasoning Compliance  : {report['base_format_compliance_pct']:.1f}% (Base) -> "
-        f"{report['grpo_format_compliance_pct']:.1f}% (GRPO)"
+        f" XML Format Compliance     : {report['base_format_compliance_pct']:.1f}% (Base) -> "
+        f"{report['post_sft_format_compliance_pct']:.1f}% (SFT warmup) -> "
+        f"{report['grpo_format_compliance_pct']:.1f}% (SFT+GRPO)"
     )
+    print(" Scope                     : training prompts and reward fn; not generalization")
     print(f" Base Weight Max |Diff|    : {report['max_base_weight_diff']:.8f}")
     print("-" * 72)
     for case in report["cases"]:
         print(f" Prompt [{case['prompt_id']}]: {case['prompt_text']}")
         print(f"   Base ({case['base_reward']:+.2f}) : {case['base_output']}")
-        print(f"   GRPO ({case['grpo_reward']:+.2f}) : {case['grpo_output']}")
+        print(f"   SFT+GRPO ({case['grpo_reward']:+.2f}) : {case['grpo_output']}")
     print("=" * 72)
 
 
