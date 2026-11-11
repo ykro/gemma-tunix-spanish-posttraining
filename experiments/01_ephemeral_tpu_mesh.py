@@ -1,9 +1,9 @@
-"""Experiment 01: Ephemeral Cloud TPU v5e 2D Device Mesh & Sharding Topology.
+"""Experiment 01: 2D ('data', 'model') Device Mesh & Sharding Topology.
 
 Configures a 2D ('data', 'model') XLA device mesh using jax.sharding.Mesh,
-PartitionSpec, and NamedSharding. Runs identically on a 4-device local XLA host
-simulation (--xla_force_host_platform_device_count=4) and a 4-chip or 8-chip
-Cloud TPU v5e slice (v5litepod-4 / v5litepod-8).
+PartitionSpec, and NamedSharding. The same code runs on a 4-device local XLA host
+simulation (--xla_force_host_platform_device_count=4) and on a 4-chip Cloud TPU
+slice (run on a v6e-4 spot VM; see benchmarks/tpu_v6e_4_spot/).
 """
 
 from __future__ import annotations

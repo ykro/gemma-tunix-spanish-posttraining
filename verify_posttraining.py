@@ -18,6 +18,7 @@ from __future__ import annotations
 
 import importlib.util
 import json
+import os
 import sys
 import time
 from pathlib import Path
@@ -70,6 +71,7 @@ def run_verification_suite() -> dict[str, Any]:
         "project": "gemma-tunix-spanish-posttraining",
         "all_checks_passed": all_passed,
         "execution_time_seconds": round(elapsed_s, 3),
+        "host_load_average_1_5_15min": [round(x, 2) for x in os.getloadavg()],
         "checks": checks,
         "stage_01_mesh": mesh_stats,
         "stage_02_gemma_nnx": gemma_stats,

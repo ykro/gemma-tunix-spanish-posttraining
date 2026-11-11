@@ -1,7 +1,12 @@
 {
   "project": "gemma-tunix-spanish-posttraining",
   "all_checks_passed": true,
-  "execution_time_seconds": 85.527,
+  "execution_time_seconds": 15.789,
+  "host_load_average_1_5_15min": [
+    8.54,
+    25.6,
+    34.94
+  ],
   "checks": {
     "multi_device_mesh_active": true,
     "weight_shard_compression_2x": true,

@@ -37,5 +37,5 @@
      Base (-0.10) : modelo reduce tpu normaliza politica politica politica politica v5e <respuesta>
      SFT+GRPO (+0.40) : <razonamiento> flax nnx separa estado grafo </respuesta> <razonamiento> flax </razonamiento>
 ==============================================================================
- VERIFICATION STATUS: PASS (9/9 checks passed in 85.53s)
+ VERIFICATION STATUS: PASS (9/9 checks passed in 15.79s)
 ==============================================================================
